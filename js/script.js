@@ -1,18 +1,41 @@
 const API_URL =
 "https://script.google.com/macros/s/AKfycbyvFEyFyDlH4luPIyLzm1rlSQaCdJXXppWswJOSwob430dIloOftSBtZbPs-hckRp1W/exec?action=menu";
 
+
 let data = {};
 let cart = {};
 let total = 0;
 
 async function loadMenu() {
 
-  const res = await fetch(API_URL);
-  const json = await res.json();
+  const menu = document.getElementById("menu");
 
-  data = json.data;
+  try {
 
-  render();
+    const res = await fetch(API_URL);
+    const json = await res.json();
+
+    console.log("Response API mentah:", json);
+
+    if (!json.success || !json.data) {
+      menu.innerHTML =
+        "Gagal memuat menu: " +
+        (json.message || "data kosong");
+      console.error("Response API:", json);
+      return;
+    }
+
+    data = json.data;
+
+    render();
+
+  } catch (err) {
+
+    menu.innerHTML =
+      "Gagal memuat menu, cek koneksi atau API.";
+    console.error("Gagal load menu:", err);
+
+  }
 
 }
 
