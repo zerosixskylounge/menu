@@ -1,0 +1,231 @@
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+:root{
+
+  --red:#ff1744;
+  --blue:#2979ff;
+  --white:#ffffff;
+  --dark:#071426;
+
+}
+
+body{
+
+  font-family:Arial,sans-serif;
+  color:var(--white);
+
+  background:
+    linear-gradient(
+      135deg,
+      #020611,
+      #08162f,
+      #0b2247
+    );
+
+  min-height:100vh;
+  padding:20px 20px 120px;
+
+}
+
+.bg-stars{
+
+  position:fixed;
+  inset:0;
+  background:
+  radial-gradient(
+    circle at 20% 20%,
+    rgba(255,255,255,.2),
+    transparent 2%
+  );
+  pointer-events:none;
+
+}
+
+.header{
+
+  text-align:center;
+  margin-bottom:20px;
+
+}
+
+.header h1{
+
+  color:white;
+  text-shadow:
+    0 0 10px var(--blue),
+    0 0 20px var(--red);
+
+}
+
+.header p{
+
+  margin-top:8px;
+  opacity:.8;
+
+}
+
+.card{
+
+  background:
+    rgba(255,255,255,.08);
+
+  backdrop-filter:blur(12px);
+
+  border:
+    1px solid rgba(255,255,255,.15);
+
+  border-radius:18px;
+
+  padding:18px;
+  margin-bottom:18px;
+
+}
+
+.card h2{
+
+  margin-bottom:15px;
+  color:#7fb3ff;
+
+}
+
+.grid-2{
+
+  display:grid;
+  gap:10px;
+  grid-template-columns:1fr 1fr;
+
+}
+
+input,
+select,
+textarea{
+
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  margin-top:10px;
+
+  background:
+    rgba(255,255,255,.12);
+
+  color:white;
+
+}
+
+textarea{
+
+  min-height:100px;
+  resize:none;
+
+}
+
+.acc{
+
+  margin-top:10px;
+  padding:12px;
+
+  border-radius:12px;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--red),
+      var(--blue)
+    );
+
+  cursor:pointer;
+  font-weight:bold;
+
+}
+
+.panel{
+
+  display:none;
+  margin-top:10px;
+
+}
+
+.menu-item{
+
+  border-bottom:
+    1px solid rgba(255,255,255,.1);
+
+  padding:15px 0;
+
+}
+
+.menu-top{
+
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+
+}
+
+.qty{
+
+  display:flex;
+  align-items:center;
+  gap:10px;
+
+}
+
+button{
+
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+
+  padding:8px 12px;
+
+  background:
+    linear-gradient(
+      45deg,
+      var(--red),
+      var(--blue)
+    );
+
+  color:white;
+  font-weight:bold;
+
+}
+
+.floating-cart{
+
+  position:fixed;
+
+  left:15px;
+  right:15px;
+  bottom:15px;
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  background:
+    rgba(0,0,0,.75);
+
+  backdrop-filter:blur(10px);
+
+  padding:15px;
+  border-radius:20px;
+
+  border:
+    1px solid rgba(255,255,255,.15);
+
+}
+
+@media(max-width:768px){
+
+  .grid-2{
+
+    grid-template-columns:1fr;
+
+  }
+
+}

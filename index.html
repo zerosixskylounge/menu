@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZERO SIX SKY LOUNGE</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="bg-stars"></div>
+
+  <header class="header">
+    <h1>ZERO SIX SKY LOUNGE</h1>
+    <p>Explore The Universe</p>
+  </header>
+
+  <section class="card">
+    <h2>Reservasi</h2>
+
+    <input id="nama" placeholder="Nama Customer">
+
+    <div class="grid-2">
+      <input type="date" id="tanggal">
+      <input type="time" id="jam">
+    </div>
+
+    <input id="eventName" placeholder="Nama Event">
+
+    <div class="grid-2">
+      <select id="lokasi">
+        <option>Indoor</option>
+        <option>Outdoor</option>
+      </select>
+
+      <input type="number" id="pax" placeholder="Pax">
+    </div>
+
+    <input id="search" placeholder="Cari Menu...">
+  </section>
+
+  <section class="card">
+    <h2>Menu</h2>
+    <div id="menu"></div>
+  </section>
+
+  <section class="card">
+    <h2>Catatan</h2>
+    <textarea id="note" placeholder="Catatan tambahan"></textarea>
+  </section>
+
+  <div class="floating-cart">
+    <div>
+      <small>Total</small>
+      <h3>Rp <span id="total">0</span></h3>
+    </div>
+
+    <button onclick="sendWA()">
+      Kirim WhatsApp
+    </button>
+  </div>
+
+  <script src="script.js"></script>
+
+</body>
+</html>
