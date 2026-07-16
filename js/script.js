@@ -1,5 +1,5 @@
 const API_URL =
-"https://script.google.com/macros/s/AKfycbyvFEyFyDlH4luPIyLzm1rlSQaCdJXXppWswJOSwob430dIloOftSBtZbPs-hckRp1W/exec";
+"https://script.google.com/macros/s/AKfycbyvFEyFyDlH4luPIyLzm1rlSQaCdJXXppWswJOSwob430dIloOftSBtZbPs-hckRp1W/exec?action=menu";
 
 let data = {};
 let cart = {};
