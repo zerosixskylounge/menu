@@ -50,10 +50,17 @@ function toggle(id) {
   const panel =
     document.getElementById(id);
 
+  const isOpen =
+    panel.style.display === "block";
+
+  document
+    .querySelectorAll(".panel")
+    .forEach(p => {
+      p.style.display = "none";
+    });
+
   panel.style.display =
-    panel.style.display === "block"
-      ? "none"
-      : "block";
+    isOpen ? "none" : "block";
 
 }
 
@@ -264,6 +271,48 @@ function updateTotal() {
 }
 
 function sendWA() {
+
+  const nama =
+    document.getElementById("nama").value.trim();
+
+  const tanggal =
+    document.getElementById("tanggal").value.trim();
+
+  const jam =
+    document.getElementById("jam").value.trim();
+
+  const eventName =
+    document.getElementById("eventName").value.trim();
+
+  const lokasi =
+    document.getElementById("lokasi").value;
+
+  const pax =
+    document.getElementById("pax").value.trim();
+
+  const requiredFields = [
+    { value: nama, label: "Nama Customer" },
+    { value: tanggal, label: "Tanggal" },
+    { value: jam, label: "Jam" },
+    { value: eventName, label: "Nama Event" },
+    { value: lokasi, label: "Lokasi" },
+    { value: pax, label: "Jumlah Pax" }
+  ];
+
+  const kosong = requiredFields.filter(
+    f => !f.value
+  );
+
+  if (kosong.length > 0) {
+
+    alert(
+      "Mohon lengkapi data berikut:\n- " +
+      kosong.map(f => f.label).join("\n- ")
+    );
+
+    return;
+
+  }
 
   if (total === 0) {
 
