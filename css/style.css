@@ -195,6 +195,36 @@ button{
 
 }
 
+.cart-line{
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+
+  padding:12px 0;
+
+  border-bottom:
+    1px solid rgba(255,255,255,.1);
+
+}
+
+.cart-line:last-child{
+
+  border-bottom:none;
+
+}
+
+.cart-line button{
+
+  background:
+    rgba(255,255,255,.15);
+
+  font-weight:normal;
+  white-space:nowrap;
+
+}
+
 .floating-cart{
 
   position:fixed;
