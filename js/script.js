@@ -204,33 +204,59 @@ function render() {
 
 }
 
+function variantLabel(opt, lvl) {
+
+  const parts = [];
+
+  if (opt) parts.push(opt);
+  if (lvl) parts.push("Level " + lvl);
+
+  return parts.length
+    ? ` (${parts.join(", ")})`
+    : "";
+
+}
+
+function lineKey(id, opt, lvl, note) {
+
+  return `${id}__${opt}__${lvl}__${note}`;
+
+}
+
 function addItem(
   name,
   id,
   price
 ) {
 
-  if (!cart[id]) {
+  const opt =
+    document.getElementById(`opt_${id}`)?.value || "";
 
-    cart[id] = {
+  const lvl =
+    document.getElementById(`lvl_${id}`)?.value || "";
+
+  const note =
+    document.getElementById(`note_${id}`)?.value.trim() || "";
+
+  const key = lineKey(id, opt, lvl, note);
+
+  if (!cart[key]) {
+
+    cart[key] = {
+      baseId: id,
       name: name,
-      qty: 0,
-      price: price
+      price: price,
+      opt: opt,
+      lvl: lvl,
+      note: note,
+      qty: 0
     };
 
   }
 
-  cart[id].qty++;
+  cart[key].qty++;
 
-  total += price;
-
-  document
-    .getElementById(
-      "q_" + id
-    ).innerText =
-    cart[id].qty;
-
-  updateTotal();
+  refreshCart();
 
 }
 
@@ -239,34 +265,134 @@ function removeItem(
   price
 ) {
 
-  if (
-    cart[id] &&
-    cart[id].qty > 0
-  ) {
+  const opt =
+    document.getElementById(`opt_${id}`)?.value || "";
 
-    cart[id].qty--;
+  const lvl =
+    document.getElementById(`lvl_${id}`)?.value || "";
 
-    total -= price;
+  const note =
+    document.getElementById(`note_${id}`)?.value.trim() || "";
 
-    document
-      .getElementById(
-        "q_" + id
-      ).innerText =
-      cart[id].qty;
+  const key = lineKey(id, opt, lvl, note);
 
-    updateTotal();
+  if (cart[key] && cart[key].qty > 0) {
+
+    cart[key].qty--;
+
+    if (cart[key].qty === 0) {
+      delete cart[key];
+    }
+
+    refreshCart();
+
+  } else {
+
+    alert(
+      "Belum ada pesanan untuk varian/catatan yang sedang dipilih ini. Cek lagi pilihan varian, level, atau catatannya."
+    );
 
   }
 
 }
 
+function removeLine(key) {
+
+  delete cart[key];
+
+  refreshCart();
+
+}
+
+function refreshCart() {
+
+  updateItemCounters();
+  updateTotal();
+  renderCartSummary();
+
+}
+
+function updateItemCounters() {
+
+  document
+    .querySelectorAll('[id^="q_"]')
+    .forEach(el => {
+      el.innerText = "0";
+    });
+
+  Object.values(cart).forEach(line => {
+
+    const el =
+      document.getElementById(`q_${line.baseId}`);
+
+    if (el) {
+      el.innerText =
+        (parseInt(el.innerText) || 0) + line.qty;
+    }
+
+  });
+
+}
+
 function updateTotal() {
+
+  total = Object.values(cart)
+    .reduce(
+      (sum, l) => sum + l.qty * l.price,
+      0
+    );
 
   document
     .getElementById(
       "total"
     ).innerText =
     formatRp(total);
+
+}
+
+function renderCartSummary() {
+
+  const el =
+    document.getElementById("cartSummary");
+
+  if (!el) return;
+
+  const keys = Object.keys(cart);
+
+  if (keys.length === 0) {
+
+    el.innerHTML =
+      "<p style='opacity:.6'>Belum ada menu dipilih.</p>";
+
+    return;
+
+  }
+
+  let html = "";
+  let no = 1;
+
+  keys.forEach(key => {
+
+    const line = cart[key];
+
+    if (line.qty <= 0) return;
+
+    html += `
+    <div class="cart-line">
+      <div>
+        <b>${no}. ${line.name}${variantLabel(line.opt, line.lvl)}</b><br>
+        ${line.note ? `<small>Catatan: ${line.note}</small><br>` : ""}
+        x${line.qty} = Rp ${formatRp(line.qty * line.price)}
+      </div>
+      <button onclick="removeLine('${key}')">Hapus</button>
+    </div>
+    `;
+
+    no++;
+
+  });
+
+  el.innerHTML = html;
 
 }
 
@@ -351,60 +477,28 @@ DETAIL PESANAN
 
   let no = 1;
 
-  for (const id in cart) {
+  Object.values(cart).forEach(line => {
 
-    const item = cart[id];
+    if (line.qty <= 0) return;
 
-    if (item.qty > 0) {
-
-      text +=
-`${no}. ${item.name}
-x${item.qty}
+    text +=
+`${no}. ${line.name}${variantLabel(line.opt, line.lvl)}
+x${line.qty}
 = Rp ${formatRp(
-item.qty * item.price
+line.qty * line.price
 )}
 `;
 
-      const opt =
-        document
-        .getElementById(
-          `opt_${id}`
-        )?.value;
-
-      const lvl =
-        document
-        .getElementById(
-          `lvl_${id}`
-        )?.value;
-
-      const note =
-        document
-        .getElementById(
-          `note_${id}`
-        )?.value;
-
-      if (opt) {
-        text +=
-          `   • ${opt}\n`;
-      }
-
-      if (lvl) {
-        text +=
-          `   • Level ${lvl}\n`;
-      }
-
-      if (note) {
-        text +=
-          `   • Catatan: ${note}\n`;
-      }
-
-      text += "\n";
-
-      no++;
-
+    if (line.note) {
+      text +=
+        `   • Catatan: ${line.note}\n`;
     }
 
-  }
+    text += "\n";
+
+    no++;
+
+  });
 
   text += `
 CATATAN TAMBAHAN:
