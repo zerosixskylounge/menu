@@ -98,6 +98,12 @@ function render() {
           (kategori + "_" + item)
           .replace(/\W/g, "_");
 
+        const hasOpt =
+          obj.options && obj.options.length;
+
+        const hasLvl =
+          obj.levels && obj.levels.length;
+
         html += `
         <div class="menu-item">
 
@@ -108,7 +114,11 @@ function render() {
               <br>
               Rp ${formatRp(price)}
             </div>
+        `;
 
+        if (!hasOpt && !hasLvl) {
+
+          html += `
             <div class="qty">
 
               <button
@@ -131,14 +141,13 @@ function render() {
               </button>
 
             </div>
+          `;
 
-          </div>
-        `;
+        }
 
-        if (
-          obj.options &&
-          obj.options.length
-        ) {
+        html += `</div>`;
+
+        if (hasOpt && hasLvl) {
 
           html += `
           <select
@@ -156,16 +165,7 @@ function render() {
               .join("")}
 
           </select>
-          `;
 
-        }
-
-        if (
-          obj.levels &&
-          obj.levels.length
-        ) {
-
-          html += `
           <select
             id="lvl_${id}">
 
@@ -181,7 +181,80 @@ function render() {
               .join("")}
 
           </select>
+
+          <div class="qty">
+
+            <button
+              onclick="removeItem(
+              '${id}',
+              ${price})">
+              -
+            </button>
+
+            <span id="q_${id}">
+              0
+            </span>
+
+            <button
+              onclick="addItem(
+              '${item}',
+              '${id}',
+              ${price})">
+              +
+            </button>
+
+          </div>
           `;
+
+        } else if (hasOpt || hasLvl) {
+
+          const dim =
+            hasOpt ? "opt" : "lvl";
+
+          const values =
+            hasOpt ? obj.options : obj.levels;
+
+          html += `<div class="variant-rows">`;
+
+          values.forEach(v => {
+
+            const safe =
+              String(v).replace(/\W/g, "_");
+
+            const elId =
+              `q_${id}__${dim}_${safe}`;
+
+            const label =
+              dim === "lvl" ? `Level ${v}` : v;
+
+            html += `
+            <div class="variant-row">
+              <span>${label}</span>
+              <div class="qty">
+                <button
+                  onclick="removeQuickVariant(
+                  '${id}',
+                  '${dim}',
+                  '${v}')">
+                  -
+                </button>
+                <span id="${elId}">0</span>
+                <button
+                  onclick="addQuickVariant(
+                  '${item}',
+                  '${id}',
+                  ${price},
+                  '${dim}',
+                  '${v}')">
+                  +
+                </button>
+              </div>
+            </div>
+            `;
+
+          });
+
+          html += `</div>`;
 
         }
 
@@ -249,7 +322,8 @@ function addItem(
       opt: opt,
       lvl: lvl,
       note: note,
-      qty: 0
+      qty: 0,
+      dispEl: `q_${id}`
     };
 
   }
@@ -296,6 +370,95 @@ function removeItem(
 
 }
 
+function addQuickVariant(
+  name,
+  id,
+  price,
+  dim,
+  value
+) {
+
+  const note =
+    document.getElementById(`note_${id}`)?.value.trim() || "";
+
+  const safe =
+    String(value).replace(/\W/g, "_");
+
+  const key =
+    `${id}__quick_${dim}_${safe}`;
+
+  if (!cart[key]) {
+
+    cart[key] = {
+      baseId: id,
+      name: name,
+      price: price,
+      opt: dim === "opt" ? value : "",
+      lvl: dim === "lvl" ? value : "",
+      note: note,
+      qty: 0,
+      dispEl: `q_${id}__${dim}_${safe}`
+    };
+
+  }
+
+  cart[key].qty++;
+  cart[key].note = note;
+
+  refreshCart();
+
+}
+
+function removeQuickVariant(
+  id,
+  dim,
+  value
+) {
+
+  const safe =
+    String(value).replace(/\W/g, "_");
+
+  const key =
+    `${id}__quick_${dim}_${safe}`;
+
+  if (cart[key] && cart[key].qty > 0) {
+
+    cart[key].qty--;
+
+    if (cart[key].qty === 0) {
+      delete cart[key];
+    }
+
+    refreshCart();
+
+  }
+
+}
+
+function incrementLine(key) {
+
+  if (!cart[key]) return;
+
+  cart[key].qty++;
+
+  refreshCart();
+
+}
+
+function decrementLine(key) {
+
+  if (!cart[key]) return;
+
+  cart[key].qty--;
+
+  if (cart[key].qty <= 0) {
+    delete cart[key];
+  }
+
+  refreshCart();
+
+}
+
 function removeLine(key) {
 
   delete cart[key];
@@ -306,13 +469,13 @@ function removeLine(key) {
 
 function refreshCart() {
 
-  updateItemCounters();
+  refreshDisplays();
   updateTotal();
   renderCartSummary();
 
 }
 
-function updateItemCounters() {
+function refreshDisplays() {
 
   document
     .querySelectorAll('[id^="q_"]')
@@ -323,7 +486,7 @@ function updateItemCounters() {
   Object.values(cart).forEach(line => {
 
     const el =
-      document.getElementById(`q_${line.baseId}`);
+      document.getElementById(line.dispEl);
 
     if (el) {
       el.innerText =
@@ -382,9 +545,16 @@ function renderCartSummary() {
       <div>
         <b>${no}. ${line.name}${variantLabel(line.opt, line.lvl)}</b><br>
         ${line.note ? `<small>Catatan: ${line.note}</small><br>` : ""}
-        x${line.qty} = Rp ${formatRp(line.qty * line.price)}
+        Rp ${formatRp(line.price)} / porsi
+        <br>
+        <small>Subtotal: Rp ${formatRp(line.qty * line.price)}</small>
       </div>
-      <button onclick="removeLine('${key}')">Hapus</button>
+      <div class="qty">
+        <button onclick="decrementLine('${key}')">-</button>
+        <span>${line.qty}</span>
+        <button onclick="incrementLine('${key}')">+</button>
+        <button onclick="removeLine('${key}')">Hapus</button>
+      </div>
     </div>
     `;
 
