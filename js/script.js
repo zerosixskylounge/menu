@@ -149,62 +149,57 @@ function render() {
 
         if (hasOpt && hasLvl) {
 
-          html += `
-          <select
-            id="opt_${id}">
+          html += `<div class="variant-rows">`;
 
-            <option value="">
-              Pilih Varian
-            </option>
+          obj.options.forEach(optValue => {
 
-            ${obj.options
-              .map(
-                v =>
-                `<option>${v}</option>`
-              )
-              .join("")}
+            const safeOpt =
+              String(optValue).replace(/\W/g, "_");
 
-          </select>
+            html += `
+            <div class="variant-group-title">
+              ${optValue}
+            </div>
+            `;
 
-          <select
-            id="lvl_${id}">
+            obj.levels.forEach(lvlValue => {
 
-            <option value="">
-              Pilih Level
-            </option>
+              const safeLvl =
+                String(lvlValue).replace(/\W/g, "_");
 
-            ${obj.levels
-              .map(
-                v =>
-                `<option>${v}</option>`
-              )
-              .join("")}
+              const elId =
+                `q_${id}__combo_${safeOpt}_${safeLvl}`;
 
-          </select>
+              html += `
+              <div class="variant-row">
+                <span>Level ${lvlValue}</span>
+                <div class="qty">
+                  <button
+                    onclick="removeComboVariant(
+                    '${id}',
+                    '${optValue}',
+                    '${lvlValue}')">
+                    -
+                  </button>
+                  <span id="${elId}">0</span>
+                  <button
+                    onclick="addComboVariant(
+                    '${item}',
+                    '${id}',
+                    ${price},
+                    '${optValue}',
+                    '${lvlValue}')">
+                    +
+                  </button>
+                </div>
+              </div>
+              `;
 
-          <div class="qty">
+            });
 
-            <button
-              onclick="removeItem(
-              '${id}',
-              ${price})">
-              -
-            </button>
+          });
 
-            <span id="q_${id}">
-              0
-            </span>
-
-            <button
-              onclick="addItem(
-              '${item}',
-              '${id}',
-              ${price})">
-              +
-            </button>
-
-          </div>
-          `;
+          html += `</div>`;
 
         } else if (hasOpt || hasLvl) {
 
@@ -420,6 +415,77 @@ function removeQuickVariant(
 
   const key =
     `${id}__quick_${dim}_${safe}`;
+
+  if (cart[key] && cart[key].qty > 0) {
+
+    cart[key].qty--;
+
+    if (cart[key].qty === 0) {
+      delete cart[key];
+    }
+
+    refreshCart();
+
+  }
+
+}
+
+function addComboVariant(
+  name,
+  id,
+  price,
+  optValue,
+  lvlValue
+) {
+
+  const note =
+    document.getElementById(`note_${id}`)?.value.trim() || "";
+
+  const safeOpt =
+    String(optValue).replace(/\W/g, "_");
+
+  const safeLvl =
+    String(lvlValue).replace(/\W/g, "_");
+
+  const key =
+    `${id}__combo_${safeOpt}_${safeLvl}`;
+
+  if (!cart[key]) {
+
+    cart[key] = {
+      baseId: id,
+      name: name,
+      price: price,
+      opt: optValue,
+      lvl: lvlValue,
+      note: note,
+      qty: 0,
+      dispEl: `q_${id}__combo_${safeOpt}_${safeLvl}`
+    };
+
+  }
+
+  cart[key].qty++;
+  cart[key].note = note;
+
+  refreshCart();
+
+}
+
+function removeComboVariant(
+  id,
+  optValue,
+  lvlValue
+) {
+
+  const safeOpt =
+    String(optValue).replace(/\W/g, "_");
+
+  const safeLvl =
+    String(lvlValue).replace(/\W/g, "_");
+
+  const key =
+    `${id}__combo_${safeOpt}_${safeLvl}`;
 
   if (cart[key] && cart[key].qty > 0) {
 
